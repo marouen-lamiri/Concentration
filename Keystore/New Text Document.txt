@@ -1,0 +1,4 @@
+Dev keystore:	 	ga0RGNYHvNM5d0SLGQfpQWAPGJ8=
+Release keystore: 	RF58ze/7QEA+A25JjblQ4JmEnns=
+Keystore Password:	Tunisie811
+Alias Password:		M@rouen1
