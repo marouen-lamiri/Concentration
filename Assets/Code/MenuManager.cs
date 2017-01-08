@@ -47,6 +47,8 @@ public class MenuManager : MonoBehaviour {
     CpuAi.DIFFICULTY m_difficulty;
     bool m_easyMode;
     int m_winStreak = 0;
+    int m_counterToWatchAds = 0;
+    const int m_adChecker = 2;
 
     void Awake()
     {
@@ -320,14 +322,25 @@ public class MenuManager : MonoBehaviour {
 
     public void ShowAd()
     {
-        if (Advertisement.IsReady())
+        if (m_adChecker != ++m_counterToWatchAds)
+            return;
+
+        if (Advertisement.IsReady() 
+            && Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork)
         {
             Advertisement.Show();
+        }
+        else if(Advertisement.IsReady("pictureZone")
+            && Application.internetReachability == NetworkReachability.ReachableViaCarrierDataNetwork)
+        {
+            Advertisement.Show("pictureZone");
         }
         else
         {
             Debug.Log("Ads not playing");
         }
+
+        m_counterToWatchAds = 0;
     }
 
     public bool isAdShowing()

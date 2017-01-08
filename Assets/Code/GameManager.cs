@@ -14,10 +14,13 @@ public class GameManager : MonoBehaviour
     public bool m_playerTurn = true;
     public MenuManager m_menuManager;
     public AudioSource m_clickSfx;
+    public Animator m_extraTurnAnim;
 
     bool m_waitCompleted = false;
     bool m_deletionCompleted = false;
+    bool m_isExtraTurnAnimPlaying = false;
     bool m_challengeMode;
+    Coroutine m_slowDownAI;
     int m_handicap;
     int m_playerScore = 0;
     int m_CPUScore = 0;
@@ -33,15 +36,15 @@ public class GameManager : MonoBehaviour
         WIN
     }
 
+    public void Awake()
+    {
+        m_defaultList = new List<Card>(m_cardList);
+    }
+
     // Use this for initialization
     public void setDifficulty(CpuAi.DIFFICULTY difficulty)
     {
         m_difficulty = difficulty;
-    }
-    
-    public void Awake()
-    {
-        m_defaultList = new List<Card>(m_cardList);
     }
 
     // Use this for initialization
@@ -66,6 +69,7 @@ public class GameManager : MonoBehaviour
     void Start()
     {
         generateBoard();
+        m_extraTurnAnim.gameObject.SetActive(false);
         m_handicap = UnityEngine.Random.Range(1,4);
     }
     
@@ -86,7 +90,7 @@ public class GameManager : MonoBehaviour
         }
         else if (m_cardList.Count > 0)
         {
-            if (m_playerTurn)
+            if (m_playerTurn && !m_isExtraTurnAnimPlaying)
             {
                 m_ai.resetTurn();
                 if (m_firstCard == null || m_secondCard == null)
@@ -96,7 +100,7 @@ public class GameManager : MonoBehaviour
             }
             else if(!m_waitCompleted)
             {
-                StartCoroutine(slowDownAI());
+                m_slowDownAI = StartCoroutine(slowDownAI());
             }
             else if(!m_playerTurn && m_waitCompleted)
             {
@@ -241,7 +245,20 @@ public class GameManager : MonoBehaviour
             Destroy(tmpCard1.gameObject);
             Destroy(tmpCard2.gameObject);
             updateScore();
-            switchTurn();
+            if(!m_playerTurn)
+            {
+                StopAllCoroutines();
+                m_ai.resetTurn();
+                m_deletionCompleted = false;
+                m_waitCompleted = false;
+            }
+            else
+            {
+                m_isExtraTurnAnimPlaying = true;
+                m_extraTurnAnim.gameObject.SetActive(true);
+                m_extraTurnAnim.Play("ExtraTurn");
+                StartCoroutine(completeExtraTurnAnim());
+            }
         }
         else if(!m_deletionCompleted)
         {
@@ -283,6 +300,14 @@ public class GameManager : MonoBehaviour
         handleTurnLogic();
         m_deletionCompleted = false;
         m_waitCompleted = false;
+    }
+
+    IEnumerator completeExtraTurnAnim()
+    {
+        yield return new WaitForSeconds(1);
+        m_extraTurnAnim.Play("Idle");
+        m_extraTurnAnim.gameObject.SetActive(false);
+        m_isExtraTurnAnimPlaying = false;
     }
 
     IEnumerator slowDownAI()
