@@ -98,7 +98,7 @@ public class GameManager : MonoBehaviour
                     compareShownCards(detectCardPress());
                 }
             }
-            else if(!m_waitCompleted)
+            else if(!m_waitCompleted && !m_isExtraTurnAnimPlaying)
             {
                 m_slowDownAI = StartCoroutine(slowDownAI());
             }
@@ -245,6 +245,7 @@ public class GameManager : MonoBehaviour
             Destroy(tmpCard1.gameObject);
             Destroy(tmpCard2.gameObject);
             updateScore();
+
             if(!m_playerTurn)
             {
                 StopAllCoroutines();
@@ -252,13 +253,11 @@ public class GameManager : MonoBehaviour
                 m_deletionCompleted = false;
                 m_waitCompleted = false;
             }
-            else
-            {
-                m_isExtraTurnAnimPlaying = true;
-                m_extraTurnAnim.gameObject.SetActive(true);
-                m_extraTurnAnim.Play("ExtraTurn");
-                StartCoroutine(completeExtraTurnAnim());
-            }
+
+            m_isExtraTurnAnimPlaying = true;
+            m_extraTurnAnim.gameObject.SetActive(true);
+            m_extraTurnAnim.Play("ExtraTurn");
+            StartCoroutine(completeExtraTurnAnim());
         }
         else if(!m_deletionCompleted)
         {
