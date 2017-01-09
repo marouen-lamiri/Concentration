@@ -325,7 +325,7 @@ public class MenuManager : MonoBehaviour {
         if (m_adChecker != ++m_counterToWatchAds)
             return;
 
-        if (Advertisement.IsReady() 
+        if (Advertisement.IsReady()
             && Application.internetReachability == NetworkReachability.ReachableViaLocalAreaNetwork)
         {
             Advertisement.Show();
@@ -366,6 +366,26 @@ public class MenuManager : MonoBehaviour {
         AdRequest request = new AdRequest.Builder().TagForChildDirectedTreatment(true).Build();
         // Load the banner with the request.
         bannerView.LoadAd(request);
+    }
+
+    void RequestImage()
+    {
+#if UNITY_EDITOR
+        string adUnitId = "unused";
+#elif UNITY_ANDROID
+        string adUnitId = "ca - app - pub - 3907298537302631 / 4282682105";
+#elif UNITY_IPHONE
+        string adUnitId = "INSERT_IOS_BANNER_AD_UNIT_ID_HERE";
+#else
+        string adUnitId = "unexpected_platform";
+#endif
+
+        // Create an image on the screen.
+        InterstitialAd intertitialAd = new InterstitialAd(adUnitId);
+        // Create an empty ad request.
+        AdRequest request = new AdRequest.Builder().TagForChildDirectedTreatment(true).Build();
+        // Load the image with the request.
+        intertitialAd.LoadAd(request);
     }
 
     void setFBProfilePic(Image img)
